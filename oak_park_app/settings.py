@@ -32,6 +32,9 @@ INSTALLED_APPS = [
     "opencivicdata.core",
     "opencivicdata.legislative",
     "councilmatic_core",
+    # pupa's own bookkeeping tables (RunPlan, etc.), used by `pupa update`
+    # to record scrape run history
+    "pupa",
     "oak_park_app",
     # Search layer - Remove if search not required
     "councilmatic_search",
@@ -195,5 +198,13 @@ HAYSTACK_CONNECTIONS = {
 HAYSTACK_SIGNAL_PROCESSOR = "haystack.signals.RealtimeSignalProcessor"
 
 WAGTAIL_SITE_NAME = "Oak Park"
+WAGTAILADMIN_BASE_URL = "/wagtail-admin"
 
 OCD_CITY_COUNCIL_NAME = os.getenv("OCD_CITY_COUNCIL_NAME", WAGTAIL_SITE_NAME)
+
+# pupa.SessionDataQualityReport still uses the old
+# django.contrib.postgres.fields.JSONField in its frozen historical
+# migrations, which is fine (Django keeps support there) but trips the
+# current-model system check. pupa's own standalone settings silence this
+# same check for the same reason.
+SILENCED_SYSTEM_CHECKS = ["fields.E904"]

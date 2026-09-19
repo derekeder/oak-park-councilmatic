@@ -46,7 +46,7 @@ services:
     volumes:
       - oak_park_postgres_data:/var/lib/postgresql/data
     ports:
-      - 32006:5432
+      - 5432:5432
 
   elasticsearch:
     image: elasticsearch:7.14.2

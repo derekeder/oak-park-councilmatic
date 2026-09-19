@@ -6,6 +6,7 @@ dj-database-url
 # Councilmatic core
 django-councilmatic[all] @ https://github.com/datamade/django-councilmatic/archive/refs/heads/5.x.zip
 pupa
+scraper-legistar @ https://github.com/opencivicdata/python-legistar-scraper/archive/master.zip
 
 # Static files and frontend
 django-webpack-loader>=2.0.0

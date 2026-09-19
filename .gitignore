@@ -12,3 +12,7 @@ static/**
 __pycache__
 downloads
 webpack-stats.json
+
+# pupa scrape output/cache
+_cache/
+_data/
