@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Legislation{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-10 offset-lg-1">
+            <h1 class="mb-4">Legislation</h1>
+
+            {% if bills %}
+                <div class="list-group mb-4">
+                    {% for bill in bills %}
+                        <a href="{% url 'bill_detail' bill.slug %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between align-items-start">
+                                <h2 class="h5 mb-1">
+                                    {{ bill.friendly_name }}
+                                    {% if bill.bill_type %}
+                                        <span class="badge text-bg-secondary">{{ bill.bill_type }}</span>
+                                    {% endif %}
+                                    {% if bill.inferred_status %}
+                                        <span class="badge text-bg-{{ bill.current_action.label }}">{{ bill.inferred_status }}</span>
+                                    {% endif %}
+                                </h2>
+                                {% if bill.last_action_date %}
+                                    <small class="text-muted text-nowrap ms-2">{{ bill.last_action_date|date:"n/d/Y" }}</small>
+                                {% endif %}
+                            </div>
+                            <p class="mb-1">{{ bill.listing_description|truncatewords:30 }}</p>
+                            {% if bill.current_action %}
+                                <small class="text-muted">
+                                    {{ bill.current_action.organization.name }} &mdash; {{ bill.current_action.description }}
+                                </small>
+                            {% endif %}
+                        </a>
+                    {% endfor %}
+                </div>
+
+                {% if is_paginated %}
+                    <nav aria-label="Legislation pages">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                            {% endif %}
+
+                            <li class="page-item disabled">
+                                <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                            </li>
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">Next</span></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <p>No legislation found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -132,6 +132,7 @@ class Oak_ParkBillScraper(LegistarAPIBillScraper, Scraper):
                         start_date=action["date"],
                         result=result,
                         bill=bill,
+                        bill_action=action["description"],
                     )
 
                     vote_event.add_source(legistar_web or legistar_api)

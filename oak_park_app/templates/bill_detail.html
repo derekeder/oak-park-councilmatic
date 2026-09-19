@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}{{ bill.friendly_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-10 offset-lg-1">
+            <p class="mb-1">
+                <a href="{% url 'bill_list' %}">&larr; Back to Legislation</a>
+            </p>
+
+            <h1 class="mb-2">
+                {{ bill.friendly_name }}
+                {% if bill.bill_type %}
+                    <span class="badge text-bg-secondary">{{ bill.bill_type }}</span>
+                {% endif %}
+                {% if bill.inferred_status %}
+                    <span class="badge text-bg-{{ bill.current_action.label }}">{{ bill.inferred_status }}</span>
+                {% endif %}
+            </h1>
+
+            <p class="lead">{{ bill.title }}</p>
+
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    {% if bill.sponsorships.all %}
+                        <h2 class="h5">Sponsors</h2>
+                        <ul class="list-unstyled">
+                            {% for sponsorship in bill.sponsorships.all %}
+                                {% if sponsorship.primary %}
+                                    <li>
+                                        {{ sponsorship.name }}
+                                        <span class="badge text-bg-light border">Primary Sponsor</span>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            {% for sponsorship in bill.sponsorships.all %}
+                                {% if not sponsorship.primary %}
+                                    <li>{{ sponsorship.name }}</li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="col-md-4">
+                    <dl class="row mb-0">
+                        <dt class="col-6">Legislative session</dt>
+                        <dd class="col-6">{{ bill.legislative_session.identifier }}</dd>
+                        {% if bill.last_action_date %}
+                            <dt class="col-6">Last action</dt>
+                            <dd class="col-6">{{ bill.last_action_date|date:"n/d/Y" }}</dd>
+                        {% endif %}
+                    </dl>
+                </div>
+            </div>
+
+            {% if bill.ocr_full_text|length > 65 %}
+                <h2 class="h5">Legislation Text</h2>
+                <div class="card mb-4">
+                    <div class="card-body" style="white-space: pre-wrap;">{{ bill.ocr_full_text }}</div>
+                </div>
+            {% endif %}
+
+            {% if bill.documents.all %}
+                <h2 class="h5">Documents</h2>
+                <ul class="list-group mb-4">
+                    {% for document in bill.documents.all %}
+                        {% for link in document.links.all %}
+                            <li class="list-group-item">
+                                <a href="{{ link.url }}" target="_blank" rel="noopener">{{ document.note }}</a>
+                            </li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {% if bill.ordered_actions %}
+                <h2 class="h5">History</h2>
+                <div class="table-responsive mb-4">
+                    <table class="table table-striped align-middle">
+                        <thead>
+                            <tr>
+                                <th scope="col">Date</th>
+                                <th scope="col">Action By</th>
+                                <th scope="col">Action</th>
+                                <th scope="col">Result</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for action in bill.ordered_actions %}
+                                <tr>
+                                    <td class="text-nowrap">{{ action.date_dt|date:"n/d/Y" }}</td>
+                                    <td>{{ action.organization.name }}</td>
+                                    <td>
+                                        <span class="badge text-bg-{{ action.label }}">{{ action.description }}</span>
+                                    </td>
+                                    <td>
+                                        {% if action.vote %}
+                                            {{ action.vote.result|capfirst }}
+                                            {% for count in action.vote.counts.all %}
+                                                <span class="small text-muted">{{ count.value }} {{ count.option }}</span>
+                                            {% endfor %}
+                                            {% if action.vote.votes.all %}
+                                                <div class="small text-muted">
+                                                    {% for personvote in action.vote.votes.all|dictsort:"voter_name" %}
+                                                        {{ personvote.voter_name }} ({{ personvote.option }}){% if not forloop.last %}, {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+
+            <p class="small text-muted">
+                {% for source in bill.sources.all %}
+                    <a href="{{ source.url }}" target="_blank" rel="noopener">View source ({{ source.note }})</a>{% if not forloop.last %} &middot; {% endif %}
+                {% endfor %}
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

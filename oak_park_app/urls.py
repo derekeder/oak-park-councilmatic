@@ -11,6 +11,12 @@ from . import views
 
 urlpatterns = [
     path("", views.IndexView.as_view(), name="index"),
+    path("legislation/", views.BillListView.as_view(), name="bill_list"),
+    path(
+        "legislation/<slug:slug>/",
+        views.BillDetailView.as_view(),
+        name="bill_detail",
+    ),
     path("robots.txt", views.robots_txt, name="robots_txt"),
     path("admin/", admin.site.urls),
     path("", include("councilmatic_search.urls")),
