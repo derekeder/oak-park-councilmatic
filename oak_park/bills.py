@@ -4,6 +4,8 @@ from legistar.bills import LegistarAPIBillScraper
 from pupa.scrape import Bill, Scraper, VoteEvent
 from pupa.utils import _make_pseudo_id
 
+from .utils import clean_url
+
 
 class Oak_ParkBillScraper(LegistarAPIBillScraper, Scraper):
     BASE_URL = "https://webapi.legistar.com/v1/oak-park"
@@ -160,7 +162,7 @@ class Oak_ParkBillScraper(LegistarAPIBillScraper, Scraper):
                 ]:
                     bill.add_document_link(
                         attachment["MatterAttachmentName"],
-                        attachment["MatterAttachmentHyperlink"].strip(),
+                        clean_url(attachment["MatterAttachmentHyperlink"].strip()),
                         media_type="application/pdf",
                     )
 

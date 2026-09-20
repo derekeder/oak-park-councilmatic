@@ -3,6 +3,8 @@ import datetime
 from legistar.events import LegistarAPIEventScraper
 from pupa.scrape import Event, Scraper
 
+from .utils import clean_url
+
 
 class Oak_ParkEventScraper(LegistarAPIEventScraper, Scraper):
     BASE_URL = "https://webapi.legistar.com/v1/oak-park"
@@ -66,14 +68,14 @@ class Oak_ParkEventScraper(LegistarAPIEventScraper, Scraper):
             if api_event["EventAgendaFile"]:
                 e.add_document(
                     note="Agenda",
-                    url=api_event["EventAgendaFile"],
+                    url=clean_url(api_event["EventAgendaFile"]),
                     media_type="application/pdf",
                 )
 
             if api_event["EventMinutesFile"]:
                 e.add_document(
                     note="Minutes",
-                    url=api_event["EventMinutesFile"],
+                    url=clean_url(api_event["EventMinutesFile"]),
                     media_type="application/pdf",
                 )
 
