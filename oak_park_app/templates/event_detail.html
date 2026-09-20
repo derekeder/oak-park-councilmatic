@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}{{ event.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-10 offset-lg-1">
+            <p class="mb-1">
+                <a href="{% url 'events' %}">&larr; Back to Events</a>
+            </p>
+
+            <h1 class="mb-2">
+                {{ event.name }}
+                <span class="badge text-bg-secondary">{{ event.status|capfirst }}</span>
+            </h1>
+
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <p class="lead mb-1">{{ event.local_start_time|date:"l, N j, Y \a\t g:i A" }}</p>
+                    {% if event.location %}
+                        <p class="text-muted">{{ event.location.name }}</p>
+                    {% endif %}
+                </div>
+                <div class="col-md-4">
+                    {% if event.participants.all %}
+                        <h2 class="h6">Participants</h2>
+                        <ul class="list-unstyled mb-0">
+                            {% for participant in event.participants.all %}
+                                <li>{{ participant.name }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if event.clean_agenda_items %}
+                <h2 class="h5">Agenda</h2>
+                <ul class="list-group mb-4">
+                    {% for item in event.clean_agenda_items %}
+                        <li class="list-group-item">
+                            {{ item.description }}
+                            {% for related in item.related_entities.all %}
+                                {% if related.entity_type == "bill" and related.bill.councilmatic_bill %}
+                                    <a href="{% url 'bill_detail' related.bill.councilmatic_bill.slug %}" class="badge text-bg-light border">
+                                        {{ related.bill.identifier }}
+                                    </a>
+                                {% endif %}
+                            {% endfor %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {% if event.documents.all %}
+                <h2 class="h5">Documents</h2>
+                <ul class="list-group mb-4">
+                    {% for document in event.documents.all %}
+                        {% for link in document.links.all %}
+                            <li class="list-group-item">
+                                <a href="{{ link.url }}" target="_blank" rel="noopener">{{ document.note }}</a>
+                            </li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <p class="small text-muted">
+                {% for source in event.sources.all %}
+                    <a href="{{ source.url }}" target="_blank" rel="noopener">View source{% if source.note %} ({{ source.note }}){% endif %}</a>{% if not forloop.last %} &middot; {% endif %}
+                {% endfor %}
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
