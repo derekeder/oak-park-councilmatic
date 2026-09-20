@@ -17,6 +17,12 @@ urlpatterns = [
         views.BillDetailView.as_view(),
         name="bill_detail",
     ),
+    path("events/", views.EventListView.as_view(), name="events"),
+    path(
+        "event/<slug:slug>/",
+        views.EventDetailView.as_view(),
+        name="event_detail",
+    ),
     path("robots.txt", views.robots_txt, name="robots_txt"),
     path("admin/", admin.site.urls),
     path("", include("councilmatic_search.urls")),
