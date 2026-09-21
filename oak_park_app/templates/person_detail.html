@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}{{ person.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-10 offset-lg-1">
+            <h1 class="mb-2">
+                {{ person.name }}
+                {% if council_membership %}
+                    <small class="text-muted">{{ council_membership.role }}</small>
+                {% endif %}
+            </h1>
+
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    {% if council_membership %}
+                        <p class="text-muted mb-1">
+                            {% if council_term_active %}
+                                In office since {{ council_membership.start_date_dt|date:"n/d/Y" }}
+                            {% else %}
+                                In office {{ council_membership.start_date_dt|date:"n/d/Y" }}&ndash;{{ council_membership.end_date_dt|date:"n/d/Y" }}
+                            {% endif %}
+                        </p>
+                    {% endif %}
+
+                    {% if person.chair_role_memberships or person.member_role_memberships %}
+                        <h2 class="h6 mt-3">Committees</h2>
+                        <table class="table table-sm">
+                            <tbody>
+                                {% for membership in person.chair_role_memberships %}
+                                    <tr>
+                                        <td>{{ membership.organization.name }}</td>
+                                        <td class="text-muted">Chair</td>
+                                    </tr>
+                                {% endfor %}
+                                {% for membership in person.member_role_memberships %}
+                                    <tr>
+                                        <td>{{ membership.organization.name }}</td>
+                                        <td class="text-muted">Member</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-8">
+                    {% if sponsored_legislation %}
+                        <h2 class="h5">Sponsored Legislation</h2>
+                        <div class="list-group mb-4">
+                            {% for bill in sponsored_legislation %}
+                                <a href="{% url 'bill_detail' bill.slug %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between align-items-start">
+                                        <span>{{ bill.friendly_name }}</span>
+                                        {% if bill.last_action_date %}
+                                            <small class="text-muted text-nowrap ms-2">{{ bill.last_action_date|date:"n/d/Y" }}</small>
+                                        {% endif %}
+                                    </div>
+                                    <p class="mb-0 small">{{ bill.listing_description|truncatewords:20 }}</p>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <p class="small text-muted">
+                {% for source in person.sources.all %}
+                    <a href="{{ source.url }}" target="_blank" rel="noopener">View source{% if source.note %} ({{ source.note }}){% endif %}</a>{% if not forloop.last %} &middot; {% endif %}
+                {% endfor %}
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

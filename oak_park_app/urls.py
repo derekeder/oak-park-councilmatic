@@ -23,6 +23,8 @@ urlpatterns = [
         views.EventDetailView.as_view(),
         name="event_detail",
     ),
+    path("people/", views.PersonListView.as_view(), name="people"),
+    path("person/<slug:slug>/", views.PersonDetailView.as_view(), name="person"),
     path("robots.txt", views.robots_txt, name="robots_txt"),
     path("admin/", admin.site.urls),
     path("", include("councilmatic_search.urls")),

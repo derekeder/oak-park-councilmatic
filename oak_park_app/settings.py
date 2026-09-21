@@ -200,7 +200,20 @@ HAYSTACK_SIGNAL_PROCESSOR = "haystack.signals.RealtimeSignalProcessor"
 WAGTAIL_SITE_NAME = "Oak Park"
 WAGTAILADMIN_BASE_URL = "/wagtail-admin"
 
-OCD_CITY_COUNCIL_NAME = os.getenv("OCD_CITY_COUNCIL_NAME", WAGTAIL_SITE_NAME)
+# Must match the Organization.name that oak_park's people/bills/events
+# scrapers use for the Village Board (see TOP_LEVEL_BODY_NAME in
+# oak_park/people.py), since django-councilmatic matches on this string
+# (e.g. Person.latest_council_membership, Bill.pseudo_topics).
+CITY_COUNCIL_NAME = "President and Board of Trustees"
+OCD_CITY_COUNCIL_NAME = os.getenv("OCD_CITY_COUNCIL_NAME", CITY_COUNCIL_NAME)
+CITY_COUNCIL_MEETING_NAME = "President and Board of Trustees"
+
+# Oak Park doesn't record distinct chair/vice-chair titles for committee
+# OfficeRecords (every non-board committee membership comes through with
+# role="Member"), so only COMMITTEE_MEMBER_TITLE has anything to match.
+COMMITTEE_CHAIR_TITLE = "Chair"
+COMMITTEE_VICE_CHAIR_TITLE = "Vice Chair"
+COMMITTEE_MEMBER_TITLE = "Member"
 
 # pupa.SessionDataQualityReport still uses the old
 # django.contrib.postgres.fields.JSONField in its frozen historical

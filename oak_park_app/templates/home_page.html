@@ -3,21 +3,96 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-10 offset-1">
-        <div class="p-5 my-4 bg-secondary-subtle rounded-3">
-            <div class="container-fluid py-5">
-                <h1 class="display-5 fw-bold">Hello, world! 👋</h1>
-                <p class="col-md-8 fs-4">Welcome to your new Councilmatic instance.</p>
-                <p>Your database contains:</p>
-                <div class="row">
-                    <div class="col"><span class="fs-1 fw-bold">{{ bill_count }}</span><br /><small> Bills</small></div>
-                    <div class="col"><span class="fs-1 fw-bold">{{ event_count }}</span><br /><small> Events</small></div>
-                    <div class="col"><span class="fs-1 fw-bold">{{ person_count }}</span><br /><small> People</small></div>
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-10 offset-1">
+
+            <div class="p-5 my-4 bg-secondary-subtle rounded-3">
+                <div class="container-fluid py-5">
+                    <h1 class="display-5 fw-bold">Oak Park Councilmatic</h1>
+                    <p class="col-md-8 fs-4">Legislative information for the Village of Oak Park, demystified.</p>
+                    <div class="row mb-4">
+                        <div class="col"><span class="fs-1 fw-bold">{{ bill_count }}</span><br /><small>Bills</small></div>
+                        <div class="col"><span class="fs-1 fw-bold">{{ event_count }}</span><br /><small>Events</small></div>
+                        <div class="col"><span class="fs-1 fw-bold">{{ person_count }}</span><br /><small>People</small></div>
+                    </div>
+                    <a href="{% url 'bill_list' %}" class="btn btn-primary me-2">Browse Legislation</a>
+                    <a href="{% url 'events' %}" class="btn btn-outline-primary me-2">Browse Events</a>
+                    <a href="{% url 'people' %}" class="btn btn-outline-primary">Browse People</a>
                 </div>
             </div>
+
+            {% if next_council_meeting or upcoming_committee_meetings %}
+                <div class="row my-4">
+                    <div class="col-12">
+                        <h2>Upcoming Meetings</h2>
+                        <div class="row">
+                            {% if next_council_meeting %}
+                                <div class="col-md-6">
+                                    <h3 class="h5">Next Board Meeting</h3>
+                                    <p class="mb-1">{{ next_council_meeting.local_start_time|date:"l, N j, Y \a\t g:i A" }}</p>
+                                    <a href="{% url 'event_detail' next_council_meeting.slug %}">View details &rarr;</a>
+                                </div>
+                            {% endif %}
+                            {% if upcoming_committee_meetings %}
+                                <div class="col-md-6">
+                                    <h3 class="h5">Committee Meetings</h3>
+                                    <ul class="list-unstyled">
+                                        {% for event in upcoming_committee_meetings %}
+                                            <li class="mb-1">
+                                                {{ event.local_start_time|date:"n/d" }} &mdash;
+                                                <a href="{% url 'event_detail' event.slug %}">{{ event.name }}</a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                    <a href="{% url 'events' %}">All upcoming events &rarr;</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if last_council_meeting %}
+                <div class="row my-4">
+                    <div class="col-12">
+                        <h2>Latest Board Meeting</h2>
+                        <p>
+                            At the <a href="{% url 'event_detail' last_council_meeting.slug %}">latest Board meeting</a>
+                            on {{ last_council_meeting.local_start_time|date:"N j, Y" }}, the Board took action on
+                            <strong>{{ council_bills.count }}</strong> piece{{ council_bills.count|pluralize }} of legislation.
+                        </p>
+                        {% if council_bills %}
+                            <div class="list-group mb-3">
+                                {% for bill in council_bills|slice:":5" %}
+                                    <a href="{% url 'bill_detail' bill.slug %}" class="list-group-item list-group-item-action">
+                                        {{ bill.friendly_name }} &mdash; {{ bill.listing_description|truncatewords:15 }}
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if recent_bills %}
+                <div class="row my-4">
+                    <div class="col-12">
+                        <h2>Since the Last Board Meeting</h2>
+                        <p>The Village has introduced <strong>{{ recent_bills|length }}</strong> new piece{{ recent_bills|length|pluralize }} of legislation.</p>
+                        <div class="list-group mb-3">
+                            {% for bill in recent_bills|slice:":5" %}
+                                <a href="{% url 'bill_detail' bill.slug %}" class="list-group-item list-group-item-action">
+                                    {{ bill.friendly_name }} &mdash; {{ bill.listing_description|truncatewords:15 }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                        <a href="{% url 'bill_list' %}">All legislation &rarr;</a>
+                    </div>
+                </div>
+            {% endif %}
+
         </div>
     </div>
 </div>
 {% endblock %}
-
